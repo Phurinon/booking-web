@@ -9,7 +9,7 @@ const app = express()
 const port = process.env.PORT
 
 app.get('/', (req, res) => {
-    res.send('This is folk/back-dev')
+    res.json('This is folk/back-dev')
 })
 
 
