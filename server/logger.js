@@ -1,5 +1,5 @@
 import { createLogger, format, transports } from "winston"
-const { combine, timestamp, printf, errors } = format;
+const { combine, timestamp, printf, colorize, errors } = format;
 import DailyRotateFile from "winston-daily-rotate-file"
 
 const logFormat = printf(({ level, message, timestamp, stack }) => {
@@ -11,6 +11,7 @@ const logger = createLogger({
   format: combine(
     timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
     errors({ stack: true }),
+    colorize({all:true}),
     logFormat
   ),
   transports: [
