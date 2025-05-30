@@ -1,80 +1,148 @@
-import FormInputs from "@/components/form/FormInputs";
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import TextAreaInput from "@/components/form/TextAreaInput";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { placeSchema } from "@/utils/schemas";
-import Buttons from "@/components/form/Buttons";
-import CategoryInput from "@/components/form/CategoryInput";
+import React from "react";
+import { Form, Input, Button, InputNumber } from "antd";
+import CategoryInput from "@/components/form/CategoryInput"; // สมมติว่ายังใช้ของเดิม
 import Mainmap from "@/components/map/Mainmap";
+import { Select } from "antd";
+import { categories } from "@/utils/categories";
+import Swal from 'sweetalert2';
+
+
+const { TextArea } = Input;
 
 function Place() {
-  const { register, handleSubmit, formState, setValue } = useForm({resolver: zodResolver(placeSchema)});
-  const { errors, isSubmitting } = formState
+  const [form] = Form.useForm();
 
-  useEffect(() => {
-    // console.log("isSubmitting:", isSubmitting);
-  }, [isSubmitting]);
+  const onSubmit = async (data) => {
+    Swal.fire({
+      title: "กำลังบันทึกข้อมูล...",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading(); // แสดง spinner
+      },
+    });
 
-  const Submit = async (data) => {
-    await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate a network request
-    console.log(data)
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // mock API
+      console.log(data);
+
+      Swal.fire({
+        icon: "success",
+        title: "บันทึกข้อมูลสำเร็จ!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        text: error.message || "ไม่สามารถบันทึกข้อมูลได้",
+      });
+    }
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log("❌ Failed:", errorInfo);
   };
 
   return (
     <section>
-      <h1 className="capitalize text-2xl font-bold px-8 mb-4">create your place</h1>
-      <div className="border p-8 m-8 rounded-md ">
-        <form onSubmit={handleSubmit(Submit)}>
-          <div className="grid md:grid-cols-2 gap-4 break-words">
-            <FormInputs 
-            register={register} 
-            name='title' 
-            type='text'
-            placeholder='Title of the place...'/>
-            {errors.title && <p className="text-red-500 text-xs ">{errors.title.message}</p>}
-            
-            <FormInputs 
-            register={register} 
-            name='price' 
-            type='number'
-            placeholder='Price of the place...'
-            valueAsNumber={true}/>
-            {errors.price && <p className="text-red-500 text-xs ">{errors.price.message}</p>}
+      <h1 className="capitalize text-2xl font-bold px-8 my-4">
+        เพิ่มสถานที่ใหม่
+      </h1>
+      <div className="border p-8 m-8 rounded-md">
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onSubmit}
+          onFinishFailed={onFinishFailed}
+        >
+          <div className="grid md:grid-cols-2 gap-4">
+            <Form.Item
+              label="ชื่อสถานที่"
+              name="title"
+              rules={[{ required: true, message: "กรุณากรอกชื่อสถานที่" }]}
+            >
+              <Input placeholder="Title of the place..." />
+            </Form.Item>
 
-            <TextAreaInput 
-            register={register} 
-            name='address' 
-            type='text'
-            placeholder='Address of the place...'/>
-            {errors.address && <p className="text-red-500 text-xs ">{errors.address.message}</p>}
+            <Form.Item
+              label="ราคา"
+              name="price"
+              rules={[{ required: true, message: "กรุณากรอกราคา" }]}
+            >
+              <InputNumber
+                placeholder="Price of the place..."
+                style={{ width: "100%" }}
+                min={0}
+                step={1}
+                formatter={(value) =>
+                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(value) => value.replace(/[^0-9]/g, "")}
+                onKeyDown={(e) => {
+                  const allowedKeys = [
+                    "Backspace",
+                    "Delete",
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "Tab",
+                  ];
+                  if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                onPaste={(e) => {
+                  const pasted = e.clipboardData.getData("text");
+                  if (!/^\d+$/.test(pasted)) {
+                    e.preventDefault();
+                  }
+                }}
+              />
+            </Form.Item>
 
-            <CategoryInput 
-            name='category'
-            register={register}
-            setValue={setValue}
-            />
-            
-            <TextAreaInput 
-            register={register} 
-            name='description' 
-            type='text'
-            placeholder='Description of the place...'/>
-            {errors.description && <p className="text-red-500 text-xs  md:col-span-2">{errors.description.message}</p>}
-            
+            <Form.Item
+              label="ที่อยู่"
+              name="address"
+              rules={[{ required: true, message: "กรุณากรอกที่อยู่" }]}
+            >
+              <TextArea rows={3} placeholder="Address of the place..." />
+            </Form.Item>
 
+            <Form.Item
+              label="ประเภทสถานที่"
+              name="category"
+              rules={[{ required: true, message: "กรุณาเลือกประเภทสถานที่" }]}
+            >
+              <Select placeholder="เลือกประเภท">
+                {categories.map((item) => (
+                  <Select.Option key={item.label} value={item.label}>
+                    {item.label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              label="รายละเอียด"
+              name="description"
+              rules={[{ required: true, message: "กรุณากรอกรายละเอียด" }]}
+              className="md:col-span-2"
+            >
+              <TextArea rows={4} placeholder="Description of the place..." />
+            </Form.Item>
           </div>
 
-          <Mainmap
-          register={register}
-          setValue={setValue}
-          />
+          {/* map component ควรส่งค่าให้ form ผ่าน `form.setFieldsValue()` */}
+          <div className="mb-8">
+            <Mainmap form={form} />
+          </div>
 
-
-            <Buttons 
-            text='create place' 
-            isPending={isSubmitting}/>
-        </form>
+          <Form.Item className="mt-4">
+            <Button type="primary" htmlType="submit" loading={false}>
+              เพิ่มสถานที่
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     </section>
   );
