@@ -32,7 +32,7 @@ function DropdownListMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-white dark:bg-gray-800 text-black dark:text-white shadow-md border rounded-md">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        {/* <DropdownMenuLabel>My Account</DropdownMenuLabel> */}
         <DropdownMenuSeparator />
         {
           links.map((item, index) => {

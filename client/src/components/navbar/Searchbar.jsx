@@ -1,14 +1,27 @@
-import React from 'react'
-import { Input } from '../ui/input'
+import React from "react";
+// import { Input } from "../ui/input";
+import { AudioOutlined } from "@ant-design/icons";
+import { Input, Space } from "antd";
+const { Search } = Input;
+
+const suffix = (
+  <AudioOutlined
+    style={{
+      fontSize: 16,
+      color: "#1677ff",
+    }}
+  />
+);
+
+const onSearch = (value, _e, info) =>
+  console.log(info === null || info === void 0 ? void 0 : info.source, value);
 
 function Searchbar() {
   return (
-    <Input 
-        type={'text'}
-        placeholder={'Search...'}
-        className='w-full sm:w-64 bg-gray-700 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md p-2'
-    />
-  )
+    <Space direction="vertical">
+      <Search placeholder="search here..." onSearch={onSearch} enterButton />
+    </Space>
+  );
 }
 
-export default Searchbar
+export default Searchbar;
