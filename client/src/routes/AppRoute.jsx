@@ -6,6 +6,7 @@ import Manage from '@/pages/admin/Manage';
 import Place from '@/pages/admin/Place';
 import Home from '@/pages/Home';
 import Notfound from '@/pages/Notfound';
+import Profile from '@/pages/user/Profile';
 import React from 'react'
 import { Outlet } from 'react-router';
 import {
@@ -20,16 +21,22 @@ function AppRoute() {
       <Routes>
         {/* Publish */}
         <Route element={<Layout/>}>
-            <Route path="/" element={<Home/>} />
-            <Route path="/about" element={<About/>} />
-            <Route path="/contact" element={<h1>Contact Page</h1>} />
+          <Route path="/" element={<Home/>} />
+          <Route path="/about" element={<About/>} />
+          <Route path="/contact" element={<h1>Contact Page</h1>} />
         </Route>
 
-        {/* Private */}
+        {/* Private User*/}
+        <Route path='user' element={<Layout/>}>
+          <Route path='profile' element={<Profile/>}/>
+
+        </Route>
+
+        {/* Private Admin*/}
         <Route path='admin' element={<LayoutAdmin/>}>
-            <Route index element={<Dashboard/>}/>
-            <Route path='manage' element={<Manage/>}/>
-            <Route path='place' element={<Place/>}/>
+          <Route index element={<Dashboard/>}/>
+          <Route path='manage' element={<Manage/>}/>
+          <Route path='place' element={<Place/>}/>
         </Route>
 
         {/* Not found */}
